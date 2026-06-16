@@ -6,7 +6,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Java CI with Maven
+name: Java CI/CD with Maven
 
 on:
   push:
@@ -16,7 +16,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -33,5 +32,18 @@ jobs:
     - name: Build with Maven
       run: mvn -B package --file pom.xml
 
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
     - name: Test
       run: ./mvnw clean verify
+
+  build-image:
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Build Docker image
+        run: docker build -t springboot-sampleapp-demo:${{ github.sha }} .
